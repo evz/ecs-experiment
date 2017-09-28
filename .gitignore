@@ -1,0 +1,7 @@
+/keyrings/live/pubring.gpg~
+/keyrings/live/pubring.kbx~
+/keyrings/live/secring.gpg
+/configs/app_config.py
+/configs/nginx.conf
+gpg-deploy-key.key
+person_list/app/app_config.py
