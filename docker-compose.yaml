@@ -1,35 +1,33 @@
-version: '3'
+version: '3.3'
 services:
   nginx:
     image: nginx:latest
     container_name: nginx
     ports:
       - "80:80"
-    volumes:
-      - ./configs/nginx.conf:/etc/nginx/conf.d/person_list.conf
     links:
+      - app
+    volumes:
+      - ./configs/person_list.conf:/etc/nginx/conf.d/person_list.conf
+      - ./person_list/app/static:/static
+    depends_on:
       - app
   app:
     build: person_list
     container_name: app
-    command: "gunicorn -t 180 --log-level info -b 127.0.0.1:5000 runserver:app"
-    volumes:
-      - ./person_list:/code
-      - ./gpg-deploy-key.key:/code
+    command: sh -c './wait-for-it.sh database:5432 -- gunicorn -b 0.0.0.0:5000 runserver:app'
     expose:
       - "5000"
     links:
       - database
-      - redis
-  database:
-    build: local-postgresql
-    container_name: database
     volumes:
-      - ./local-postgresql/data:/var/lib/postgresql/data
+      - ./person_list:/code
+    depends_on:
+      - database
+  database:
+    build: database
+    container_name: database
     expose:
       - "5432"
-  redis:
-    image: redis:latest
-    container_name: redis
-    expose:
-      - "6379"
+    volumes:
+      - ./database/base:/var/lib/postgresql/data
