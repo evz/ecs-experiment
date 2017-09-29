@@ -20,10 +20,12 @@ services:
       - "5000"
     links:
       - database
-    volumes:
-      - ./person_list:/code
     depends_on:
       - database
+    secrets:
+      - app_config
+    environment:
+      APPLICATION_CONFIG: /run/secrets/app_config
   database:
     build: database
     container_name: database
@@ -31,3 +33,6 @@ services:
       - "5432"
     volumes:
       - ./database/base:/var/lib/postgresql/data
+secrets:
+  app_config:
+    file: configs/app_config.py
